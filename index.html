@@ -1,275 +1,86 @@
-<!DOCTYPE html>
-<html lang="he">
-<head>
-<meta charset="utf-8" />
-<title>מפת גינות ובתי קפה – שאלון איכויות</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<style>
-body {
-  margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidden;
-}
-#map { position:absolute; top:0; bottom:0; width:100%; }
-
-.popup-container {
-  position: fixed; top:50%; left:50%;
-  transform: translate(-50%, -50%) scale(0.8);
-  background: #ffffff;
-  padding:16px 20px;
-  border-radius:16px;
-  width:90%; max-width:360px;
-  z-index:9999;
-  text-align:right;
-  color:#000;
-  box-shadow:0 8px 20px rgba(0,0,0,0.4);
-  display:none;
-  opacity:0;
-  transition:all 0.3s ease-in-out;
-}
-.popup-container.show {
-  display:block; opacity:1; transform:translate(-50%, -50%) scale(1);
-}
-.popup-container h4 { margin:6px 0; font-size:1.1em; }
-.popup-container p.question { font-weight:bold; margin-bottom:8px; font-size:1em; }
-.popup-container img {
-  width:120px; height:120px; border-radius:50%;
-  object-fit:contain !important;
-  background-color:#fff;
-  border:2px solid #ddd; margin:8px auto; display:block;
-  transform: scale(1.2);
-}
-.popup-container label { display:block; margin:4px 0; font-size:0.95em; }
-.popup-container textarea {
-  width:90%; border-radius:4px; padding:4px; margin-top:4px; font-family:inherit;
-  display:block; transform: scale(1.2);
-}
-.popup-container button {
-  background-color:#388E3C; color:white; border:none; border-radius:8px;
-  padding:8px 16px; margin:6px; cursor:pointer; font-weight:bold; transition:all 0.2s;
-}
-.popup-container button:hover { background-color:#2e7d32; }
-.save-msg { display:none; font-weight:bold; margin-top:8px; color:#388E3C; }
-
-#nickname-popup input {
-  width:90%; padding:6px; border-radius:6px; margin-top:6px;
-  font-size:1em; font-family:inherit;
-}
-
-#nickname-popup p { font-size:1em; margin-bottom:6px; }
-
-#additional-question {
-  opacity:0; transform:translateY(10px);
-  transition:all 0.35s ease;
-}
-#additional-question.show { opacity:1; transform:translateY(0); }
-
-.marker-thumb {
-  width:52px; height:52px; border-radius:50%;
-  border:2px solid white; overflow:hidden;
-  box-shadow:0 0 4px rgba(0,0,0,0.4);
-  background-color:#4CAF50; position:relative;
-}
-.marker-thumb img { 
-  width:100%; height:100%; 
-  object-fit:cover !important;
-}
-
-.confirm-icon {
-  position:absolute; top:40%; left:50%;
-  transform:translate(-50%, -50%) scale(0.8);
-  background-color:#00C853; color:white; font-weight:bold;
-  border-radius:50%; width:72px; height:72px;
-  text-align:center; line-height:72px; font-size:48px;
-  opacity:0; transition:all 0.4s ease;
-  pointer-events:none; z-index:1000;
-}
-.confirm-icon.show { opacity:1; transform:translate(-50%, -50%) scale(1.2); }
-
-#main-question {
-  position:fixed; top:10px; left:50%; transform:translateX(-50%);
-  background:#fff; padding:12px 16px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3);
-  max-width:360px; z-index:9999; text-align:center; font-size:0.95em;
-  color:#000; transition:all 0.3s ease;
-}
-#main-question.hide { opacity:1; transform:translate(-50%, 0); pointer-events:auto; }
-
-#finish-btn {
-  position:fixed;
-  bottom:10px;
-  left:10px;
-  background:#ccc;
-  color:white;
-  border:none;
-  border-radius:8px;
-  padding:10px 20px;
-  cursor:not-allowed;
-  font-weight:bold;
-  z-index:9999;
-  transition:all 0.3s ease;
-}
-#finish-btn.ready { background:#388E3C; cursor:pointer; }
-</style>
-</head>
-<body>
-
-<div id="map"></div>
-
-<div id="main-question">
-  <strong>אילו איכויות יש למרחבים הציבוריים הירוקים בסביבת המגורים שלכם?</strong><br>
-  אנא לחצו על תמונה וענו על השאלה.
-</div>
-
-<!-- חלונית כינוי -->
-<div id="nickname-popup" class="popup-container">
-  <p>😊 אנא הכניסו כינוי אישי (לזכר/נקבה):</p>
-  <input type="text" id="nickname-input" placeholder="למשל: פילפילון">
-  <button id="nickname-submit">שלח</button>
-</div>
-
-<div id="popup" class="popup-container">
-  <p class="question">אילו איכויות יש למרחב?</p>
-  <h4 id="popup-title"></h4>
-  <img id="popup-img" src="">
-  <div id="checkboxes"></div>
-  <div id="additional-question">
-    <p><strong>האם יש למקום איכויות נוספות?</strong></p>
-    <button id="yes-btn">כן</button>
-    <button id="no-btn">לא</button>
-  </div>
-  <div id="save-msg" class="save-msg">✔ נשמר!</div>
-</div>
-
-<div id="check-icon" class="confirm-icon">✔</div>
-<button id="finish-btn">סיום שאלון</button>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaK_KZMPvipc2uLa_3GFAX4PDjlFNBoyFG9-oe5PSsnAs2ctOtyinN_LAW-E9Y-T_r/exec";
+// כתובת ה-URL של הסקר (הקישור לגוגל שיטס)
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyom4ORO0eatLuYOOL8U0H89aUWAp0iWlwVqoSZ2NTrRtWgPycwGJOQwIiz3SKC-mFQ/exec";
 
-const map = L.map("map").setView([32.125, 34.802], 16);
+// יצירת המפה
+const map = L.map("map").setView([32.125,34.802],16);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
-const qualities = [
-  "נוף יפה","מרחב טבע","הרגשה של יער","חופש ומרחב","פארק אטרקטיבי",
-  "שקט ושלווה","אזור עם מתקנים לפעילויות","היסטוריה ותרבות","אתר טבע חשוב",
-  "לא נעים","מפחיד","רועש","איכות אחרת – כתבו כאן:"
-];
+// רשימת איכויות לכל פארק
+const qualities = ["נוף יפה","מרחב טבע","הרגשה של יער","חופש ומרחב","פארק אטרקטיבי","שקט ושלווה","אזור עם מתקנים לפעילויות","היסטוריה ותרבות","אתר טבע חשוב","לא נעים","מפחיד","רועש","איכות אחרת – כתבו כאן:"];
 
-const excluded = [
-  "אקופארק גלילות","גינת אלבוים רון","גן רווזאניס","גינת קריספין חיים",
-  "גינת רומנו","גינת ריזפלד","מחנה דולפין","חולות","בית הלוחם"
-];
-
+// נתוני הפארקים (כולל שמות, קואורדינטות ותמונות)
 const parksData = [
-  {"name":"גן רוזין","lat":32.126187,"lon":34.803838},
-  {"name":"גן אלפרד ביר","lat":32.126725,"lon":34.799704},
-  {"name":"מרכז קהילתי רוזין","lat":32.126956,"lon":34.804118},
-  {"name":"מרכז אלרם-שוסטר","lat":32.125162,"lon":34.803658},
-  {"name":"קאנטרי גימל","lat":32.127565,"lon":34.803042},
-  {"name":"גן הפסל","lat":32.126009,"lon":34.797823},
-  {"name":"גן פיינשטיין","lat":32.127806,"lon":34.798541},
-  {"name":"גן מלקינד","lat":32.128201,"lon":34.796766},
-  {"name":"קאנטרי ברזני","lat":32.127002,"lon":34.796730},
-  {"name":"חורשת דרזנר","lat":32.128074,"lon":34.806370},
-  {"name":"גן יהודה ליש","lat":32.125499,"lon":34.805951},
-  {"name":"גן כצנלסון","lat":32.123660,"lon":34.799530},
-  {"name":"גן בויאר","lat":32.123350,"lon":34.795436},
-  {"name":"גן המייסדים","lat":32.129443,"lon":34.791957},
-  {"name":"גן אביגור-אזורי חן","lat":32.129959,"lon":34.794299},
-  {"name":"גינת בוסתן המינים","lat":32.129725,"lon":34.792718},
-  {"name":"גינת מוקדי","lat":32.128172,"lon":34.793628},
-  {"name":"גן שניצר","lat":32.126109,"lon":34.793089},
-  {"name":"מגרש סמבורסקי","lat":32.126767,"lon":34.793759},
-  {"name":"גינת ברלין","lat":32.124129,"lon":34.792870},
-  {"name":"קאנטרי אזורי חן","lat":32.130632,"lon":34.792803},
-  {"name":"גינת אלכסנדר פן","lat":32.123369,"lon":34.811476},
-  {"name":"גינת מיקדו","lat":32.122888,"lon":34.815628},
-  {"name":"גן שורר חיים","lat":32.122829,"lon":34.811449},
-  {"name":"גן בית צורי","lat":32.12311275936392,"lon":34.801534712924436},
-  {"name":"גן ליאון רקנאטי","lat":32.12273266261491,"lon":34.803450038810816},
-  {"name":"גינת ברקאי","lat":32.1240135,"lon":34.8064948},
-  {"name":"גינת הרוחות","lat":32.12349022117299,"lon":34.816722543405106}
-].filter(p => !excluded.includes(p.name));
+  {"name":"גן רוזין","lat":32.126187,"lon":34.803838, "image":"images/rosin.jpg"},
+  {"name":"גן אלפרד ביר","lat":32.126725,"lon":34.799704, "image":"images/alfred.jpg"},
+  {"name":"מרכז קהילתי רוזין","lat":32.126956,"lon":34.804118, "image":"images/community.jpg"}
+  // הוסף כאן את יתר הפארקים עם שמותיהם, קואורדינטותיהם והתמונות
+];
 
 let nickname = "";
+
+// התייחסות לחלונית הכינוי
 const nicknamePopup = document.getElementById("nickname-popup");
 const nicknameInput = document.getElementById("nickname-input");
 const nicknameSubmit = document.getElementById("nickname-submit");
 
-// הצגת חלונית הכינוי מיד
-nicknamePopup.classList.add("show");
-
+// הוספת כינוי אישי
 nicknameSubmit.onclick = () => {
   if(nicknameInput.value.trim()==="") { alert("אנא הכניסו כינוי!"); return; }
   nickname = nicknameInput.value.trim();
-  localStorage.setItem("nickname", nickname);
-  
-  fetch(SCRIPT_URL,{
-    method:"POST",
-    body: JSON.stringify({nickname, timestamp:new Date().toISOString()}),
-    headers: {"Content-Type":"application/json"}
-  });
-
   nicknamePopup.classList.remove("show");
-  alert("תודה! עכשיו אפשר להתחיל במפה 😊");
+  alert("תודה! עכשיו אפשר להתחיל במפה.");
 };
 
-const userId = localStorage.getItem("userId") || Math.random().toString(36).substr(2,9);
-localStorage.setItem("userId", userId);
-
+// שליחה לגוגל שיטס
 function sendDataToSheet(parkName, quality, value){
-  fetch(SCRIPT_URL, {
+  fetch(SCRIPT_URL,{
     method:"POST",
-    body: JSON.stringify({parkName, quality, value, userId, nickname, timestamp:new Date().toISOString()}),
+    body: JSON.stringify({parkName, quality, value, nickname, timestamp:new Date().toISOString()}),
     headers: {"Content-Type":"application/json"}
-  }).then(res => res.json()).then(d => console.log("נשלח:", d)).catch(e => console.error(e));
+  })
+  .then(res=>res.json())
+  .then(d=>console.log("נשלח:",d))
+  .catch(e=>console.error("שגיאה בשמירה:", e));
 }
 
-function createIcon(name, active=false){
+// יצירת סמל לפארק על המפה
+function createIcon(active=false){
   const borderColor = active ? "#00C853":"white";
   const background = active ? "#C8E6C9":"#4CAF50";
-  return L.divIcon({
-    className:"",
-    html:`<div class="marker-thumb" style="border-color:${borderColor};background:${background};">
-            <img src="images/${name}.jpg" onerror="this.style.display='none';this.parentElement.style.backgroundColor='#228B22';">
-          </div>`
-  });
+  return L.divIcon({className:"", html:`<div style="width:32px;height:32px;border-radius:50%;border:2px solid ${borderColor};background:${background};"></div>`});
 }
 
 let selectedParks = 0;
-const mainQuestion = document.getElementById("main-question");
 const finishBtn = document.getElementById("finish-btn");
 
+// הוספת כל הפארקים על המפה
 parksData.forEach(p=>{
   p.hasSelection=false;
-  const marker = L.marker([p.lat,p.lon], {icon:createIcon(p.name,false)}).addTo(map);
+  const marker = L.marker([p.lat,p.lon],{icon:createIcon(false)}).addTo(map);
 
   marker.on("click",()=>{
     const popup=document.getElementById("popup");
     const title=document.getElementById("popup-title");
-    const img=document.getElementById("popup-img");
     const checkboxesDiv=document.getElementById("checkboxes");
     const additionalQ=document.getElementById("additional-question");
     const yesBtn=document.getElementById("yes-btn");
     const noBtn=document.getElementById("no-btn");
     const saveMsg=document.getElementById("save-msg");
-    const checkIcon=document.getElementById("check-icon");
 
     title.textContent=p.name;
-    img.src=`images/${p.name}.jpg`;
-
     checkboxesDiv.innerHTML="";
-    additionalQ.classList.remove("show");
+    additionalQ.style.display="none";
     saveMsg.style.display="none";
+
+    checkboxesDiv.innerHTML+=`<img src="${p.image}" alt="${p.name}" style="width:100%;border-radius:10px;margin-bottom:10px;">`;
 
     qualities.forEach(q=>{
       if(q.includes("איכות אחרת")){
-        checkboxesDiv.innerHTML+=
-          `<label><input type="checkbox" value="${q}" class="chk"> ${q}</label>
-           <textarea class="other-text" placeholder="כתבו כאן..." rows="2"></textarea>`;
+        checkboxesDiv.innerHTML+=`<label><input type="checkbox" value="${q}" class="chk"> ${q}</label><textarea class="other-text" placeholder="כתבו כאן..." rows="2"></textarea>`;
       } else {
-        checkboxesDiv.innerHTML+=
-          `<label><input type="checkbox" value="${q}" class="chk"> ${q}</label>`;
+        checkboxesDiv.innerHTML+=`<label><input type="checkbox" value="${q}" class="chk"> ${q}</label>`;
       }
     });
 
@@ -277,49 +88,50 @@ parksData.forEach(p=>{
 
     const checkboxes = checkboxesDiv.querySelectorAll("input[type='checkbox']");
     const otherField = checkboxesDiv.querySelector(".other-text");
-    let typingTimer;
 
     checkboxes.forEach(chk=>{
       chk.onchange=()=>{
         const anyChecked=[...checkboxes].some(c=>c.checked);
-
+        if
         if(!p.hasSelection && anyChecked) selectedParks++;
         p.hasSelection=anyChecked;
 
-        marker.setIcon(createIcon(p.name, anyChecked));
+        marker.setIcon(createIcon(anyChecked));
+
         sendDataToSheet(p.name, chk.value, chk.checked);
 
-        if(anyChecked){
-          checkIcon.classList.add("show");
-          setTimeout(()=>{ checkIcon.classList.remove("show"); additionalQ.classList.add("show"); },800);
+        if(anyChecked) {
+          saveMsg.style.display = "block";
         }
 
-        if(selectedParks>=5) finishBtn.classList.add("ready");
+        if(selectedParks > 0) {
+          finishBtn.classList.add("ready");
+          finishBtn.style.cursor = "pointer";
+        } else {
+          finishBtn.classList.remove("ready");
+          finishBtn.style.cursor = "not-allowed";
+        }
       };
     });
 
-    if(otherField){
-      otherField.addEventListener("input", ()=>{
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(()=>{ sendDataToSheet(p.name,"איכות אחרת (טקסט חופשי)",otherField.value); },1200);
-      });
-    }
-
-    yesBtn.onclick=()=>additionalQ.classList.remove("show");
-    noBtn.onclick=()=>{
-      additionalQ.classList.remove("show");
-      saveMsg.style.display="block";
-      setTimeout(()=>popup.classList.remove("show"),1500);
+    yesBtn.onclick = () => {
+      additionalQ.style.display = "none";
+      sendDataToSheet(p.name, "איכות אחרת", otherField.value);
     };
 
+    noBtn.onclick = () => {
+      additionalQ.style.display = "none";
+    };
   });
 });
 
-finishBtn.onclick=()=>{
-  if(selectedParks>=5) alert("תודה שסיימתם את השאלון!");
+// סיום השאלון
+finishBtn.onclick = () => {
+  if(finishBtn.classList.contains("ready")) {
+    alert("תודה על השתתפותך בשאלון!");
+  }
 };
+
 </script>
 </body>
 </html>
-
-
