@@ -74,10 +74,10 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 const qualities = ["נוף יפה","מרחב טבע","הרגשה של יער","חופש ומרחב","פארק אטרקטיבי","שקט ושלווה","אזור עם מתקנים לפעילויות","היסטוריה ותרבות","אתר טבע חשוב","לא נעים","מפחיד","רועש","איכות אחרת – כתבו כאן:"];
 
 const parksData = [
-  {"name":"גן רוזין","lat":32.126187,"lon":34.803838},
-  {"name":"גן אלפרד ביר","lat":32.126725,"lon":34.799704},
-  {"name":"מרכז קהילתי רוזין","lat":32.126956,"lon":34.804118}
-  // ניתן להוסיף כאן את כל שאר הפארקים
+  {"name":"גן רוזין","lat":32.126187,"lon":34.803838, "image":"images/rosin.jpg"},
+  {"name":"גן אלפרד ביר","lat":32.126725,"lon":34.799704, "image":"images/alfred.jpg"},
+  {"name":"מרכז קהילתי רוזין","lat":32.126956,"lon":34.804118, "image":"images/community.jpg"}
+  // כאן תוכל להוסיף את כל הפארקים שלך כולל נתיב התמונה עבור כל אחד
 ];
 
 let nickname = "";
@@ -131,6 +131,8 @@ parksData.forEach(p=>{
     additionalQ.style.display="none";
     saveMsg.style.display="none";
 
+    checkboxesDiv.innerHTML+=`<img src="${p.image}" alt="${p.name}" style="width:100%;border-radius:10px;margin-bottom:10px;">`;
+
     qualities.forEach(q=>{
       if(q.includes("איכות אחרת")){
         checkboxesDiv.innerHTML+=`<label><input type="checkbox" value="${q}" class="chk"> ${q}</label><textarea class="other-text" placeholder="כתבו כאן..." rows="2"></textarea>`;
@@ -164,25 +166,4 @@ parksData.forEach(p=>{
       };
     });
 
-    if(otherField){
-      otherField.addEventListener("input", ()=>{
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(()=>{ sendDataToSheet(p.name,"איכות אחרת (טקסט חופשי)",otherField.value); },1200);
-      });
-    }
-
-    yesBtn.onclick=()=>additionalQ.style.display="none";
-    noBtn.onclick=()=>{
-      additionalQ.style.display="none";
-      saveMsg.style.display="block";
-      setTimeout(()=>popup.classList.remove("show"),1500);
-    };
-  });
-});
-
-finishBtn.onclick=()=>{
-  if(selectedParks>=1) alert("תודה שסיימתם את השאלון!");
-};
-</script>
-</body>
-</html>
+    if
