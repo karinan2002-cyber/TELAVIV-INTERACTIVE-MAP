@@ -1,31 +1,90 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="utf-8" />
+<title>מפת גינות – שאלון איכויות</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidden; }
+#map { position:absolute; top:0; bottom:0; width:100%; }
+
+.popup-container {
+  position: fixed; top:50%; left:50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: #ffffff;
+  padding:16px 20px;
+  border-radius:16px;
+  width:90%; max-width:360px;
+  z-index:9999;
+  text-align:right;
+  color:#000;
+  box-shadow:0 8px 20px rgba(0,0,0,0.4);
+  display:none;
+  opacity:0;
+  transition:all 0.3s ease-in-out;
+}
+.popup-container.show { display:block; opacity:1; transform:translate(-50%, -50%) scale(1); }
+
+.popup-container h4 { margin:6px 0; font-size:1.1em; }
+.popup-container p.question { font-weight:bold; margin-bottom:8px; font-size:1em; }
+.popup-container textarea { width:90%; border-radius:4px; padding:4px; margin-top:4px; font-family:inherit; display:block; }
+.popup-container label { display:block; margin:4px 0; font-size:0.95em; }
+.popup-container button { background-color:#388E3C; color:white; border:none; border-radius:8px; padding:8px 16px; margin:6px; cursor:pointer; font-weight:bold; transition:all 0.2s; }
+.popup-container button:hover { background-color:#2e7d32; }
+.save-msg { display:none; font-weight:bold; margin-top:8px; color:#388E3C; }
+
+#finish-btn { position:fixed; bottom:10px; left:10px; background:#ccc; color:white; border:none; border-radius:8px; padding:10px 20px; cursor:not-allowed; font-weight:bold; z-index:9999; transition:all 0.3s ease; }
+#finish-btn.ready { background:#388E3C; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- חלונית שאלון פתיחה לכינוי -->
+<div id="nickname-popup" class="popup-container show">
+  <p>😊 אנא הכניסו כינוי אישי:</p>
+  <input type="text" id="nickname-input" placeholder="למשל: פילפילון">
+  <button id="nickname-submit">שלח</button>
+</div>
+
+<!-- חלונית שאלון לכל פארק -->
+<div id="popup" class="popup-container">
+  <p class="question">אילו איכויות יש למרחב?</p>
+  <h4 id="popup-title"></h4>
+  <div id="checkboxes"></div>
+  <div id="additional-question">
+    <p><strong>האם יש למקום איכויות נוספות?</strong></p>
+    <button id="yes-btn">כן</button>
+    <button id="no-btn">לא</button>
+  </div>
+  <div id="save-msg" class="save-msg">✔ נשמר!</div>
+</div>
+
+<button id="finish-btn">סיום שאלון</button>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// כתובת ה-URL של הסקר (הקישור לגוגל שיטס)
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyom4ORO0eatLuYOOL8U0H89aUWAp0iWlwVqoSZ2NTrRtWgPycwGJOQwIiz3SKC-mFQ/exec";
 
-// יצירת המפה
 const map = L.map("map").setView([32.125,34.802],16);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
-// רשימת איכויות לכל פארק
 const qualities = ["נוף יפה","מרחב טבע","הרגשה של יער","חופש ומרחב","פארק אטרקטיבי","שקט ושלווה","אזור עם מתקנים לפעילויות","היסטוריה ותרבות","אתר טבע חשוב","לא נעים","מפחיד","רועש","איכות אחרת – כתבו כאן:"];
 
-// נתוני הפארקים (כולל שמות, קואורדינטות ותמונות)
 const parksData = [
-  {"name":"גן רוזין","lat":32.126187,"lon":34.803838, "image":"images/rosin.jpg"},
-  {"name":"גן אלפרד ביר","lat":32.126725,"lon":34.799704, "image":"images/alfred.jpg"},
-  {"name":"מרכז קהילתי רוזין","lat":32.126956,"lon":34.804118, "image":"images/community.jpg"}
-  // הוסף כאן את יתר הפארקים עם שמותיהם, קואורדינטותיהם והתמונות
+  {"name":"גן רוזין","lat":32.126187,"lon":34.803838},
+  {"name":"גן אלפרד ביר","lat":32.126725,"lon":34.799704},
+  {"name":"מרכז קהילתי רוזין","lat":32.126956,"lon":34.804118}
+  // ניתן להוסיף כאן את כל שאר הפארקים
 ];
 
 let nickname = "";
-
-// התייחסות לחלונית הכינוי
 const nicknamePopup = document.getElementById("nickname-popup");
 const nicknameInput = document.getElementById("nickname-input");
 const nicknameSubmit = document.getElementById("nickname-submit");
 
-// הוספת כינוי אישי
 nicknameSubmit.onclick = () => {
   if(nicknameInput.value.trim()==="") { alert("אנא הכניסו כינוי!"); return; }
   nickname = nicknameInput.value.trim();
@@ -33,7 +92,7 @@ nicknameSubmit.onclick = () => {
   alert("תודה! עכשיו אפשר להתחיל במפה.");
 };
 
-// שליחה לגוגל שיטס
+// פונקציה לשליחת הנתונים לגוגל שיטס
 function sendDataToSheet(parkName, quality, value){
   fetch(SCRIPT_URL,{
     method:"POST",
@@ -45,7 +104,6 @@ function sendDataToSheet(parkName, quality, value){
   .catch(e=>console.error("שגיאה בשמירה:", e));
 }
 
-// יצירת סמל לפארק על המפה
 function createIcon(active=false){
   const borderColor = active ? "#00C853":"white";
   const background = active ? "#C8E6C9":"#4CAF50";
@@ -55,7 +113,6 @@ function createIcon(active=false){
 let selectedParks = 0;
 const finishBtn = document.getElementById("finish-btn");
 
-// הוספת כל הפארקים על המפה
 parksData.forEach(p=>{
   p.hasSelection=false;
   const marker = L.marker([p.lat,p.lon],{icon:createIcon(false)}).addTo(map);
@@ -74,8 +131,6 @@ parksData.forEach(p=>{
     additionalQ.style.display="none";
     saveMsg.style.display="none";
 
-    checkboxesDiv.innerHTML+=`<img src="${p.image}" alt="${p.name}" style="width:100%;border-radius:10px;margin-bottom:10px;">`;
-
     qualities.forEach(q=>{
       if(q.includes("איכות אחרת")){
         checkboxesDiv.innerHTML+=`<label><input type="checkbox" value="${q}" class="chk"> ${q}</label><textarea class="other-text" placeholder="כתבו כאן..." rows="2"></textarea>`;
@@ -88,11 +143,11 @@ parksData.forEach(p=>{
 
     const checkboxes = checkboxesDiv.querySelectorAll("input[type='checkbox']");
     const otherField = checkboxesDiv.querySelector(".other-text");
+    let typingTimer;
 
     checkboxes.forEach(chk=>{
       chk.onchange=()=>{
         const anyChecked=[...checkboxes].some(c=>c.checked);
-        if
         if(!p.hasSelection && anyChecked) selectedParks++;
         p.hasSelection=anyChecked;
 
@@ -100,38 +155,34 @@ parksData.forEach(p=>{
 
         sendDataToSheet(p.name, chk.value, chk.checked);
 
-        if(anyChecked) {
-          saveMsg.style.display = "block";
+        if(anyChecked){
+          saveMsg.style.display="block";
+          setTimeout(()=>popup.classList.remove("show"),1500);
         }
 
-        if(selectedParks > 0) {
-          finishBtn.classList.add("ready");
-          finishBtn.style.cursor = "pointer";
-        } else {
-          finishBtn.classList.remove("ready");
-          finishBtn.style.cursor = "not-allowed";
-        }
+        if(selectedParks>=1) finishBtn.classList.add("ready");
       };
     });
 
-    yesBtn.onclick = () => {
-      additionalQ.style.display = "none";
-      sendDataToSheet(p.name, "איכות אחרת", otherField.value);
-    };
+    if(otherField){
+      otherField.addEventListener("input", ()=>{
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(()=>{ sendDataToSheet(p.name,"איכות אחרת (טקסט חופשי)",otherField.value); },1200);
+      });
+    }
 
-    noBtn.onclick = () => {
-      additionalQ.style.display = "none";
+    yesBtn.onclick=()=>additionalQ.style.display="none";
+    noBtn.onclick=()=>{
+      additionalQ.style.display="none";
+      saveMsg.style.display="block";
+      setTimeout(()=>popup.classList.remove("show"),1500);
     };
   });
 });
 
-// סיום השאלון
-finishBtn.onclick = () => {
-  if(finishBtn.classList.contains("ready")) {
-    alert("תודה על השתתפותך בשאלון!");
-  }
+finishBtn.onclick=()=>{
+  if(selectedParks>=1) alert("תודה שסיימתם את השאלון!");
 };
-
 </script>
 </body>
 </html>
