@@ -218,21 +218,27 @@ fetch(SCRIPT_URL,{
 const userId = localStorage.getItem("userId") || Math.random().toString(36).substr(2,9);
 localStorage.setItem("userId", userId);
 
-function sendDataToSheet(parkName, quality, value){
-  fetch(SCRIPT_URL, {
-    method:"POST",
-    mode:"no-cors",
+function sendDataToSheet(parkName, quality, value) {
+  const userId = localStorage.getItem("userId") || Math.random().toString(36).substr(2,9);
+  localStorage.setItem("userId", userId);
+
+  const nickname = localStorage.getItem("nickname") || "";
+
+  fetch("https://script.google.com/macros/s/כאן_ה‑URL_של_ה‑SCRIPT/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       parkName,
       quality,
       value,
       userId,
       nickname,
-      timestamp:new Date().toISOString()
-    }),
-    headers: {"Content-Type":"application/json"}
+      timestamp: new Date().toISOString()
+    })
   });
 }
+
 
 function createIcon(name, active=false){
   const borderColor = active ? "#00C853":"white";
@@ -330,6 +336,7 @@ finishBtn.onclick=()=>{
 </script>
 </body>
 </html>
+
 
 
 
