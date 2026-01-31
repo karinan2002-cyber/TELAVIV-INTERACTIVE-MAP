@@ -28,23 +28,22 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
 .marker-thumb {
   width: 52px;
   height: 52px;
-  border-radius: 50%;
-  border: 2px solid white;
-  overflow: hidden;  
+  border-radius: 50%;         /* עיגול חיצוני */
+  border: 2px solid white;    /* מסגרת */
+  background-color: #4CAF50;  /* צבע רקע למי שלא ממלא */
+  display: flex;              /* כדי למרכז את התמונה */
+  align-items: center;        /* מרכז אנכי */
+  justify-content: center;    /* מרכז אופקי */
+  overflow: hidden;
   box-shadow: 0 0 4px rgba(0,0,0,0.4);
-  background-color: #4CAF50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
 }
 
 .marker-thumb img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;    /* אין חיתוכים */
-  object-position: center; /* מרכז */
-  border-radius: 0;        /* ביטול עיגול על התמונה */
+  max-width: 100%;            /* לא חותך רוחב */
+  max-height: 100%;           /* לא חותך גובה */
+  object-fit: contain;         /* כל התמונה נשמרת */
+  object-position: center;     /* מרכז את התמונה בתוך העיגול */
+  border-radius: 0;            /* ביטול עיגול על התמונה עצמה */
 }
 
 .confirm-icon { position:absolute; top:40%; left:50%; transform:translate(-50%, -50%) scale(0.8); background-color:#00C853; color:white; font-weight:bold; border-radius:50%; width:72px; height:72px; text-align:center; line-height:72px; font-size:48px; opacity:0; transition:all 0.4s ease; pointer-events:none; z-index:1000; }
@@ -270,6 +269,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
