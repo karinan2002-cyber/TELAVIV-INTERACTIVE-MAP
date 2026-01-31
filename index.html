@@ -25,12 +25,14 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
 #additional-question { opacity:0; transform:translateY(10px); transition:all 0.35s ease; }
 #additional-question.show { opacity:1; transform:translateY(0); }
 
-.marker-thumb img {
-  width: 100%;                 /* תמונה ממלאת את כל העיגול */
-  height: 100%;                /* תמונה ממלאת את כל העיגול */
-  object-fit: cover;           /* תמונה ממלאת את העיגול בלי לעוות */
-  object-position: center;     /* תמונה ממורכזת בעיגול */
-  border-radius: 0;            /* ביטול עיגול על התמונה עצמה */
+.popup-container img {
+  width: 120px;                /* גודל התמונה בפופאפ */
+  height: 120px;               /* גודל התמונה בפופאפ */
+  border-radius: 50%;          /* עיגול לתמונה */
+  object-fit: cover;           /* התמונה תכסה את העיגול בלי חיתוכים */
+  object-position: center;     /* ממורכזת בתוך העיגול */
+  background-color: #fff;      /* רקע לבן במקרה שאין תמונה */
+  border: 2px solid #ddd;      /* גבול לתמונה */
 }
 
 .confirm-icon { position:absolute; top:40%; left:50%; transform:translate(-50%, -50%) scale(0.8); background-color:#00C853; color:white; font-weight:bold; border-radius:50%; width:72px; height:72px; text-align:center; line-height:72px; font-size:48px; opacity:0; transition:all 0.4s ease; pointer-events:none; z-index:1000; }
@@ -256,6 +258,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
