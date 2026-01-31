@@ -25,24 +25,11 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
 #additional-question { opacity:0; transform:translateY(10px); transition:all 0.35s ease; }
 #additional-question.show { opacity:1; transform:translateY(0); }
 
-.marker-thumb {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;         /* עיגול חיצוני */
-  border: 2px solid white;    /* מסגרת */
-  background-color: #4CAF50;  /* צבע רקע למי שלא ממלא */
-  display: flex;              /* כדי למרכז את התמונה */
-  align-items: center;        /* מרכז אנכי */
-  justify-content: center;    /* מרכז אופקי */
-  overflow: hidden;
-  box-shadow: 0 0 4px rgba(0,0,0,0.4);
-}
-
 .marker-thumb img {
-  max-width: 100%;            /* לא חותך רוחב */
-  max-height: 100%;           /* לא חותך גובה */
-  object-fit: contain;         /* כל התמונה נשמרת */
-  object-position: center;     /* מרכז את התמונה בתוך העיגול */
+  width: 100%;                 /* תמונה ממלאת את כל העיגול */
+  height: 100%;                /* תמונה ממלאת את כל העיגול */
+  object-fit: cover;           /* תמונה ממלאת את העיגול בלי לעוות */
+  object-position: center;     /* תמונה ממורכזת בעיגול */
   border-radius: 0;            /* ביטול עיגול על התמונה עצמה */
 }
 
@@ -269,6 +256,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
