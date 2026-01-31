@@ -33,16 +33,17 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
   border-radius: 0;         /* ביטול עיגול על התמונה עצמה */
 }
 
-  .popup-container img {
-  width: 120px;
+.popup-container img {
+  width: 120px;             /* קוטר העיגול */
   height: 120px;
-  border-radius: 50%;
-  object-fit: contain;       /* שומר על פרופורציות */
-  object-position: center;   /* ממוקם במרכז */
-  background-color: #fff;
+  border-radius: 50%;       /* עיגול */
+  object-fit: contain;      /* שומר על פרופורציות */
+  object-position: center;  /* מרכז */
+  background-color: #fff;   /* צבע רקע למילוי השוליים */
   border: 2px solid #ddd;
+  display: block;
+  margin: 0 auto;
 }
-
   
 .confirm-icon { position:absolute; top:40%; left:50%; transform:translate(-50%, -50%) scale(0.8); background-color:#00C853; color:white; font-weight:bold; border-radius:50%; width:72px; height:72px; text-align:center; line-height:72px; font-size:48px; opacity:0; transition:all 0.4s ease; pointer-events:none; z-index:1000; }
 .confirm-icon.show { opacity:1; transform:translate(-50%, -50%) scale(1.2); }
@@ -267,5 +268,6 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
