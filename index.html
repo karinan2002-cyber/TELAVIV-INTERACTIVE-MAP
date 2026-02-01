@@ -188,13 +188,17 @@ fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", body:formData });
 function createIcon(name, active=false){
   const borderColor = active ? "#00C853":"white";
   const background = active ? "#C8E6C9":"#4CAF50";
-  return L.divIcon({
-    className:"",
-    html:`<div class="marker-thumb" style="border-color:${borderColor};background:${background};">
-            <img src="images/${name}.jpg" onerror="this.style.display='none';this.parentElement.style.backgroundColor='#228B22';">
-          </div>`
-  });
-}
+return L.divIcon({
+  className: "",
+  html: `
+    <div class="marker-thumb" style="border-color:${borderColor};background:${background};">
+      <img src="images/${name}.jpg"
+           onerror="this.style.display='none';this.parentElement.style.backgroundColor='#228B22';">
+    </div>
+  `,
+  iconSize: [52, 52],      // ❗ חובה
+  iconAnchor: [26, 26]     // ❗ מרכז העיגול
+});
 
 let selectedParks = 0;
 const mainQuestion = document.getElementById("main-question");
@@ -278,6 +282,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
