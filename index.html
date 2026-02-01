@@ -73,7 +73,11 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZ5X0oUh1nU8cM60lUFkHeaRAheh2ddAM8yt0J_YmCwANVptpKuohuBwFiX6VKNec/exec"; // כאן להכניס את URL של ה-Apps Script שלך
 
+const map = L.map('map');  // כאן יוצרים את האובייקט של המפה
 map.setView([32.127, 34.798], 15);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
 const qualities = [
@@ -251,4 +255,5 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
