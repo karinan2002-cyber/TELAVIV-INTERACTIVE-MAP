@@ -12,7 +12,16 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
 .popup-container.show { display:block; opacity:1; transform:translate(-50%, -50%) scale(1); }
 .popup-container h4 { margin:6px 0; font-size:1.1em; }
 .popup-container p.question { font-weight:bold; margin-bottom:8px; font-size:1em; }
-.popup-container img { width:120px; height:120px; border-radius:50%; object-fit:contain !important; background-color:#fff; border:2px solid #ddd; margin:8px auto; display:block; transform: scale(1.2); }
+.popup-container img {
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;   /* או contain – ראה הערה למטה */
+  background-color:#fff;
+  border:2px solid #ddd;
+  margin:8px auto;
+  display:block;
+}
 .popup-container label { display:block; margin:4px 0; font-size:0.95em; }
 .popup-container textarea { width:90%; border-radius:4px; padding:4px; margin-top:4px; font-family:inherit; display:block; transform: scale(1.2); }
 .popup-container button { background-color:#388E3C; color:white; border:none; border-radius:8px; padding:8px 16px; margin:6px; cursor:pointer; font-weight:bold; transition:all 0.2s; }
@@ -25,17 +34,10 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
 #additional-question { opacity:0; transform:translateY(10px); transition:all 0.35s ease; }
 #additional-question.show { opacity:1; transform:translateY(0); }
 
-.marker-thumb {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: 2px solid white;
-  background-color: #4CAF50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  box-shadow: 0 0 4px rgba(0,0,0,0.4);
+.marker-thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 .marker-thumb img {
@@ -269,6 +271,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
