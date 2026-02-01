@@ -1,10 +1,51 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-<meta charset="utf-8" />
-<title>מפת גינות ובתי קפה – שאלון איכויות</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <meta charset="utf-8" />
+    <title>מפת גינות ובתי קפה – שאלון איכויות</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidden; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+        
+        /* עיצוב של הרמז למפה */
+        #map-hint {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 1em;
+            text-align: center;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        /* אנימציה לחץ זז */
+        .hint-arrow {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: solid 3px white;
+            border-width: 0 3px 3px 0;
+            margin-top: 10px;
+            transform: rotate(45deg);
+            animation: moveArrow 1s infinite alternate;
+        }
+
+        @keyframes moveArrow {
+            0% {
+                transform: translateX(-10px) rotate(45deg);
+            }
+            100% {
+                transform: translateX(10px) rotate(45deg);
+            }
+        }
 <style>
 body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidden; }
 #map { position:absolute; top:0; bottom:0; width:100%; }
@@ -255,5 +296,6 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
