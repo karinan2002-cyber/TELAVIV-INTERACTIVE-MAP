@@ -201,8 +201,21 @@ let selectedParks = 0;
 const mainQuestion = document.getElementById("main-question");
 const finishBtn = document.getElementById("finish-btn");
 
+<script>
+// יצירת המפה
+const map = L.map("map");
+
+// יצירת markers
 parksData.forEach(p=>{
-  p.hasSelection=false;
+  const marker = L.marker([p.lat,p.lon], {icon:createIcon(p.name,false)}).addTo(map);
+  // הקוד שלך ללחיצה על marker נשאר כאן...
+});
+
+// התאמת התצוגה לכל הגינות
+const bounds = L.latLngBounds(parksData.map(p => [p.lat, p.lon]));
+map.fitBounds(bounds.pad(0.1), { maxZoom: 16 }); // מוסיפים 10% padding מסביב לכל הגבולות
+</script>
+
   const marker = L.marker([p.lat,p.lon], {icon:createIcon(p.name,false)}).addTo(map);
 
   marker.on("click",()=>{
@@ -279,6 +292,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
