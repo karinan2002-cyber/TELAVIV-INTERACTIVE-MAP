@@ -12,16 +12,7 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
 .popup-container.show { display:block; opacity:1; transform:translate(-50%, -50%) scale(1); }
 .popup-container h4 { margin:6px 0; font-size:1.1em; }
 .popup-container p.question { font-weight:bold; margin-bottom:8px; font-size:1em; }
-.popup-container img {
-  width:120px;
-  height:120px;
-  border-radius:50%;
-  object-fit:cover;   /* או contain – ראה הערה למטה */
-  background-color:#fff;
-  border:2px solid #ddd;
-  margin:8px auto;
-  display:block;
-}
+.popup-container img { width:120px; height:120px; border-radius:50%; object-fit:contain !important; background-color:#fff; border:2px solid #ddd; margin:8px auto; display:block; transform: scale(1.2); }
 .popup-container label { display:block; margin:4px 0; font-size:0.95em; }
 .popup-container textarea { width:90%; border-radius:4px; padding:4px; margin-top:4px; font-family:inherit; display:block; transform: scale(1.2); }
 .popup-container button { background-color:#388E3C; color:white; border:none; border-radius:8px; padding:8px 16px; margin:6px; cursor:pointer; font-weight:bold; transition:all 0.2s; }
@@ -34,27 +25,9 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
 #additional-question { opacity:0; transform:translateY(10px); transition:all 0.35s ease; }
 #additional-question.show { opacity:1; transform:translateY(0); }
 
-.marker-thumb {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  overflow: hidden;
-  background-color: #ffffff;
-  border: 2px solid white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 4px rgba(0,0,0,0.4);
-}
+.marker-thumb { width:52px; height:52px; border-radius:50%; border:2px solid white; overflow:hidden; box-shadow:0 0 4px rgba(0,0,0,0.4); background-color:#4CAF50; position:relative; }
+.marker-thumb img { width:100%; height:100%; object-fit:cover !important; }
 
-.marker-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;   /* ❗ מונע זום אין */
-  object-position: center;
-  display: block;
-}
-  
 .confirm-icon { position:absolute; top:40%; left:50%; transform:translate(-50%, -50%) scale(0.8); background-color:#00C853; color:white; font-weight:bold; border-radius:50%; width:72px; height:72px; text-align:center; line-height:72px; font-size:48px; opacity:0; transition:all 0.4s ease; pointer-events:none; z-index:1000; }
 .confirm-icon.show { opacity:1; transform:translate(-50%, -50%) scale(1.2); }
 
@@ -140,7 +113,7 @@ const parksData = [
   {"name":"גן ליאון רקנאטי","lat":32.12273266261491,"lon":34.803450038810816},
   {"name":"גינת ברקאי","lat":32.1240135,"lon":34.8064948},
   {"name":"גינת הרוחות","lat":32.12349022117299,"lon":34.816722543405106},
-  {"name":"חוף הים טיילת","lat":32.12360,"lon":34.78343},
+   {"name":"חוף הים טיילת","lat":32.12360,"lon":34.78343},
 ].filter(p => !excluded.includes(p.name));
 
 let nickname = "";
@@ -154,7 +127,7 @@ nicknameSubmit.onclick = () => {
   if(nicknameInput.value.trim()==="") { alert("אנא הכניסו כינוי!"); return; }
   nickname = nicknameInput.value.trim();
   localStorage.setItem("nickname", nickname);
-  
+ 
   // שליחה ראשונית של כינוי + תאריך
   const formData = new FormData();
   formData.append("nickname", nickname);
@@ -188,17 +161,13 @@ fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", body:formData });
 function createIcon(name, active=false){
   const borderColor = active ? "#00C853":"white";
   const background = active ? "#C8E6C9":"#4CAF50";
-return L.divIcon({
-  className: "",
-  html: `
-    <div class="marker-thumb" style="border-color:${borderColor};background:${background};">
-      <img src="images/${name}.jpg"
-           onerror="this.style.display='none';this.parentElement.style.backgroundColor='#228B22';">
-    </div>
-  `,
-  iconSize: [52, 52],      // ❗ חובה
-  iconAnchor: [26, 26]     // ❗ מרכז העיגול
-});
+  return L.divIcon({
+    className:"",
+    html:`<div class="marker-thumb" style="border-color:${borderColor};background:${background};">
+            <img src="images/${name}.jpg" onerror="this.style.display='none';this.parentElement.style.backgroundColor='#228B22';">
+          </div>`
+  });
+}
 
 let selectedParks = 0;
 const mainQuestion = document.getElementById("main-question");
@@ -282,10 +251,4 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
-
-
-
-
-
-
 
