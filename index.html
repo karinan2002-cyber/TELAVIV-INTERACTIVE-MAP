@@ -8,6 +8,7 @@
 <style>
 body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidden; }
 #map { position:absolute; top:0; bottom:0; width:100%; }
+
 .popup-container {
   position: fixed;
   top: 50%;
@@ -26,7 +27,6 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
   opacity: 0;
   transition: all 0.3s ease-in-out;
 }
-
 .popup-container.show { display:block; opacity:1; transform:translate(-50%, -50%) scale(1); }
 .popup-container h4 { margin:6px 0; font-size:1.1em; }
 .popup-container p.question { font-weight:bold; margin-bottom:8px; font-size:1em; }
@@ -89,27 +89,9 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZ5X0oUh1nU8cM60lUFkHeaRAheh2ddAM8yt0J_YmCwANVptpKuohuBwFiX6VKNec/exec"; // כאן להכניס את URL של ה-Apps Script שלך
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZ5X0oUh1nU8cM60lUFkHeaRAheh2ddAM8yt0J_YmCwANVptpKuohuBwFiX6VKNec/exec";
 
-const map = L.map("map");
-
-const bounds = L.latLngBounds(
-  parksData.map(p => [p.lat, p.lon])
-);
-
-map.fitBounds(bounds, {
-  padding: [30, 30], // ריווח נעים מהקצוות
-  maxZoom: 16         // מונע זום קרוב מדי
-});
-
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-const qualities = [
-  "נוף יפה","מרחב טבע","הרגשה של יער","חופש ומרחב","פארק אטרקטיבי",
-  "שקט ושלווה","אזור עם מתקנים לפעילויות","היסטוריה ותרבות","אתר טבע חשוב",
-  "לא נעים","מפחיד","רועש","איכות אחרת – כתבו כאן:"
-];
-
+// כל הגינות והנקודות
 const excluded = ["אקופארק גלילות","גינת אלבוים רון","גן רווזאניס","גינת קריספין חיים","גינת רומנו","גינת ריזפלד","מחנה דולפין","חולות","בית הלוחם"];
 
 const parksData = [
@@ -140,52 +122,21 @@ const parksData = [
   {"name":"גן בית צורי","lat":32.12311275936392,"lon":34.801534712924436},
   {"name":"גן ליאון רקנאטי","lat":32.12273266261491,"lon":34.803450038810816},
   {"name":"גינת ברקאי","lat":32.1240135,"lon":34.8064948},
-  {"name":"גינת הרוחות","lat":32.12349022117299,"lon":34.816722543405106}, 
-  {"name":"חוף הים טיילת","lat":32.12360,"lon":34.78343},
+  {"name":"גינת הרוחות","lat":32.12349022117299,"lon":34.816722543405106},
+  {"name":"חוף הים טיילת","lat":32.12360,"lon":34.78343}
 ].filter(p => !excluded.includes(p.name));
 
-let nickname = "";
-const nicknamePopup = document.getElementById("nickname-popup");
-const nicknameInput = document.getElementById("nickname-input");
-const nicknameSubmit = document.getElementById("nickname-submit");
+const qualities = [
+  "נוף יפה","מרחב טבע","הרגשה של יער","חופש ומרחב","פארק אטרקטיבי",
+  "שקט ושלווה","אזור עם מתקנים לפעילויות","היסטוריה ותרבות","אתר טבע חשוב",
+  "לא נעים","מפחיד","רועש","איכות אחרת – כתבו כאן:"
+];
 
-nicknamePopup.classList.add("show");
+// --- מפת ליפלט ---
+const map = L.map("map");
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
-nicknameSubmit.onclick = () => {
-  if(nicknameInput.value.trim()==="") { alert("אנא הכניסו כינוי!"); return; }
-  nickname = nicknameInput.value.trim();
-  localStorage.setItem("nickname", nickname);
- 
-  // שליחה ראשונית של כינוי + תאריך
-  const formData = new FormData();
-  formData.append("nickname", nickname);
-  formData.append("timestamp", new Date().toISOString());
-
-  fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", body:formData });
-
-  nicknamePopup.classList.remove("show");
-  alert("תודה! עכשיו אפשר להתחיל במפה 😊");
-};
-
-const userId = localStorage.getItem("userId") || Math.random().toString(36).substr(2,9);
-localStorage.setItem("userId", userId);
-
-function sendDataToSheet(parkName, quality, value){
-  const userId = localStorage.getItem("userId") || Math.random().toString(36).substr(2,9);
-  localStorage.setItem("userId", userId);
-  const nickname = localStorage.getItem("nickname") || "";
-
-  const formData = new FormData();
-  formData.append("parkName", parkName);
-  formData.append("quality", quality);
-  formData.append("value", value);
-  formData.append("userId", userId);
-  formData.append("nickname", nickname);
-  formData.append("timestamp", new Date().toISOString());
-
-fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", body:formData });
-}
-
+// פונקציה ליצירת אייקון
 function createIcon(name, active=false){
   const borderColor = active ? "#00C853":"white";
   const background = active ? "#C8E6C9":"#4CAF50";
@@ -197,17 +148,42 @@ function createIcon(name, active=false){
   });
 }
 
+// --- ניהול שם משתמש ---
+let nickname = "";
+const nicknamePopup = document.getElementById("nickname-popup");
+const nicknameInput = document.getElementById("nickname-input");
+const nicknameSubmit = document.getElementById("nickname-submit");
+nicknamePopup.classList.add("show");
+
+nicknameSubmit.onclick = () => {
+  if(nicknameInput.value.trim()==="") { alert("אנא הכניסו כינוי!"); return; }
+  nickname = nicknameInput.value.trim();
+  localStorage.setItem("nickname", nickname);
+  nicknamePopup.classList.remove("show");
+  alert("תודה! עכשיו אפשר להתחיל במפה 😊");
+};
+
+const userId = localStorage.getItem("userId") || Math.random().toString(36).substr(2,9);
+localStorage.setItem("userId", userId);
+
+function sendDataToSheet(parkName, quality, value){
+  const formData = new FormData();
+  formData.append("parkName", parkName);
+  formData.append("quality", quality);
+  formData.append("value", value);
+  formData.append("userId", userId);
+  formData.append("nickname", nickname);
+  formData.append("timestamp", new Date().toISOString());
+  fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", body:formData });
+}
+
+// --- יצירת markers + popup ---
 let selectedParks = 0;
 const mainQuestion = document.getElementById("main-question");
 const finishBtn = document.getElementById("finish-btn");
 
-<script>
-const map = L.map("map");
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-// יצירת markers
 parksData.forEach(p => {
-  const marker = L.marker([p.lat, p.lon], { icon: createIcon(p.name, false) }).addTo(map);
+  const marker = L.marker([p.lat, p.lon], { icon:createIcon(p.name,false) }).addTo(map);
 
   marker.on("click", () => {
     const popup = document.getElementById("popup");
@@ -222,86 +198,9 @@ parksData.forEach(p => {
 
     title.textContent = p.name;
     img.src = `images/${p.name}.jpg`;
-
     checkboxesDiv.innerHTML = "";
     additionalQ.classList.remove("show");
     saveMsg.style.display = "none";
-
-    qualities.forEach(q => {
-      if (q.includes("איכות אחרת")) {
-        checkboxesDiv.innerHTML +=
-          `<label><input type="checkbox" value="${q}" class="chk"> ${q}</label>
-           <textarea class="other-text" placeholder="כתבו כאן..." rows="2"></textarea>`;
-      } else {
-        checkboxesDiv.innerHTML +=
-          `<label><input type="checkbox" value="${q}" class="chk"> ${q}</label>`;
-      }
-    });
-
-    popup.classList.add("show");
-
-    const checkboxes = checkboxesDiv.querySelectorAll("input[type='checkbox']");
-    const otherField = checkboxesDiv.querySelector(".other-text");
-    let typingTimer;
-
-    checkboxes.forEach(chk => {
-      chk.onchange = () => {
-        const anyChecked = [...checkboxes].some(c => c.checked);
-        if (!p.hasSelection && anyChecked) selectedParks++;
-        p.hasSelection = anyChecked;
-
-        marker.setIcon(createIcon(p.name, anyChecked));
-        sendDataToSheet(p.name, chk.value, chk.checked);
-
-        if (anyChecked) {
-          checkIcon.classList.add("show");
-          setTimeout(() => { checkIcon.classList.remove("show"); additionalQ.classList.add("show"); }, 800);
-        }
-
-        if (selectedParks >= 5) finishBtn.classList.add("ready");
-      };
-    });
-
-    if (otherField) {
-      otherField.addEventListener("input", () => {
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(() => { sendDataToSheet(p.name, "איכות אחרת (טקסט חופשי)", otherField.value); }, 1200);
-      });
-    }
-
-    yesBtn.onclick = () => additionalQ.classList.remove("show");
-    noBtn.onclick = () => {
-      additionalQ.classList.remove("show");
-      saveMsg.style.display = "block";
-      setTimeout(() => popup.classList.remove("show"), 1500);
-    };
-  });
-});
-
-// התאמת המפה לכל הנקודות
-const bounds = L.latLngBounds(parksData.map(p => [p.lat, p.lon]));
-map.fitBounds(bounds.pad(0.1), { maxZoom: 16 });
-</script>
-
-  const marker = L.marker([p.lat,p.lon], {icon:createIcon(p.name,false)}).addTo(map);
-
-  marker.on("click",()=>{
-    const popup=document.getElementById("popup");
-    const title=document.getElementById("popup-title");
-    const img=document.getElementById("popup-img");
-    const checkboxesDiv=document.getElementById("checkboxes");
-    const additionalQ=document.getElementById("additional-question");
-    const yesBtn=document.getElementById("yes-btn");
-    const noBtn=document.getElementById("no-btn");
-    const saveMsg=document.getElementById("save-msg");
-    const checkIcon=document.getElementById("check-icon");
-
-    title.textContent=p.name;
-    img.src=`images/${p.name}.jpg`;
-
-    checkboxesDiv.innerHTML="";
-    additionalQ.classList.remove("show");
-    saveMsg.style.display="none";
 
     qualities.forEach(q=>{
       if(q.includes("איכות אחרת")){
@@ -309,8 +208,7 @@ map.fitBounds(bounds.pad(0.1), { maxZoom: 16 });
           `<label><input type="checkbox" value="${q}" class="chk"> ${q}</label>
            <textarea class="other-text" placeholder="כתבו כאן..." rows="2"></textarea>`;
       } else {
-        checkboxesDiv.innerHTML+=
-          `<label><input type="checkbox" value="${q}" class="chk"> ${q}</label>`;
+        checkboxesDiv.innerHTML+=`<label><input type="checkbox" value="${q}" class="chk"> ${q}</label>`;
       }
     });
 
@@ -322,9 +220,9 @@ map.fitBounds(bounds.pad(0.1), { maxZoom: 16 });
 
     checkboxes.forEach(chk=>{
       chk.onchange=()=>{
-        const anyChecked=[...checkboxes].some(c=>c.checked);
+        const anyChecked = [...checkboxes].some(c=>c.checked);
         if(!p.hasSelection && anyChecked) selectedParks++;
-        p.hasSelection=anyChecked;
+        p.hasSelection = anyChecked;
 
         marker.setIcon(createIcon(p.name, anyChecked));
         sendDataToSheet(p.name, chk.value, chk.checked);
@@ -351,18 +249,14 @@ map.fitBounds(bounds.pad(0.1), { maxZoom: 16 });
       saveMsg.style.display="block";
       setTimeout(()=>popup.classList.remove("show"),1500);
     };
-
   });
 });
+
+// --- התאמת תצוגת המפה לכל הגינות כולל חוף הים ---
+const bounds = L.latLngBounds(parksData.map(p => [p.lat, p.lon]));
+map.fitBounds(bounds.pad(0.1), { maxZoom: 16 });
 
 finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את השאלון!"); };
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
