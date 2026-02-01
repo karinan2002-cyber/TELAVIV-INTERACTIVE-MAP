@@ -202,18 +202,85 @@ const mainQuestion = document.getElementById("main-question");
 const finishBtn = document.getElementById("finish-btn");
 
 <script>
-// יצירת המפה
 const map = L.map("map");
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
 // יצירת markers
-parksData.forEach(p=>{
-  const marker = L.marker([p.lat,p.lon], {icon:createIcon(p.name,false)}).addTo(map);
-  // הקוד שלך ללחיצה על marker נשאר כאן...
+parksData.forEach(p => {
+  const marker = L.marker([p.lat, p.lon], { icon: createIcon(p.name, false) }).addTo(map);
+
+  marker.on("click", () => {
+    const popup = document.getElementById("popup");
+    const title = document.getElementById("popup-title");
+    const img = document.getElementById("popup-img");
+    const checkboxesDiv = document.getElementById("checkboxes");
+    const additionalQ = document.getElementById("additional-question");
+    const yesBtn = document.getElementById("yes-btn");
+    const noBtn = document.getElementById("no-btn");
+    const saveMsg = document.getElementById("save-msg");
+    const checkIcon = document.getElementById("check-icon");
+
+    title.textContent = p.name;
+    img.src = `images/${p.name}.jpg`;
+
+    checkboxesDiv.innerHTML = "";
+    additionalQ.classList.remove("show");
+    saveMsg.style.display = "none";
+
+    qualities.forEach(q => {
+      if (q.includes("איכות אחרת")) {
+        checkboxesDiv.innerHTML +=
+          `<label><input type="checkbox" value="${q}" class="chk"> ${q}</label>
+           <textarea class="other-text" placeholder="כתבו כאן..." rows="2"></textarea>`;
+      } else {
+        checkboxesDiv.innerHTML +=
+          `<label><input type="checkbox" value="${q}" class="chk"> ${q}</label>`;
+      }
+    });
+
+    popup.classList.add("show");
+
+    const checkboxes = checkboxesDiv.querySelectorAll("input[type='checkbox']");
+    const otherField = checkboxesDiv.querySelector(".other-text");
+    let typingTimer;
+
+    checkboxes.forEach(chk => {
+      chk.onchange = () => {
+        const anyChecked = [...checkboxes].some(c => c.checked);
+        if (!p.hasSelection && anyChecked) selectedParks++;
+        p.hasSelection = anyChecked;
+
+        marker.setIcon(createIcon(p.name, anyChecked));
+        sendDataToSheet(p.name, chk.value, chk.checked);
+
+        if (anyChecked) {
+          checkIcon.classList.add("show");
+          setTimeout(() => { checkIcon.classList.remove("show"); additionalQ.classList.add("show"); }, 800);
+        }
+
+        if (selectedParks >= 5) finishBtn.classList.add("ready");
+      };
+    });
+
+    if (otherField) {
+      otherField.addEventListener("input", () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => { sendDataToSheet(p.name, "איכות אחרת (טקסט חופשי)", otherField.value); }, 1200);
+      });
+    }
+
+    yesBtn.onclick = () => additionalQ.classList.remove("show");
+    noBtn.onclick = () => {
+      additionalQ.classList.remove("show");
+      saveMsg.style.display = "block";
+      setTimeout(() => popup.classList.remove("show"), 1500);
+    };
+  });
 });
 
-// התאמת התצוגה לכל הגינות
+// התאמת המפה לכל הנקודות
 const bounds = L.latLngBounds(parksData.map(p => [p.lat, p.lon]));
-map.fitBounds(bounds.pad(0.1), { maxZoom: 16 }); // מוסיפים 10% padding מסביב לכל הגבולות
+map.fitBounds(bounds.pad(0.1), { maxZoom: 16 });
 </script>
 
   const marker = L.marker([p.lat,p.lon], {icon:createIcon(p.name,false)}).addTo(map);
@@ -292,6 +359,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
