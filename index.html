@@ -46,6 +46,38 @@
                 transform: translateX(10px) rotate(45deg);
             }
         }
+
+        /* שאר העיצוב... */
+        .popup-container { position: fixed; top:50%; left:50%; transform: translate(-50%, -50%) scale(0.8); background: #fff; padding:16px 20px; border-radius:16px; width:90%; max-width:360px; z-index:9999; text-align:right; color:#000; box-shadow:0 8px 20px rgba(0,0,0,0.4); display:none; opacity:0; transition:all 0.3s ease-in-out; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- הוספת הרמז כאן -->
+<div id="map-hint">
+    גררו את המפה ימינה ושמאלה
+    <div class="hint-arrow"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // כל שאר הקוד שלך
+
+    const mapHint = document.getElementById("map-hint");
+
+    if(window.innerWidth < 768) { // רק לנייד
+        mapHint.style.opacity = 1;
+
+        const hideHint = () => {
+            mapHint.style.opacity = 0;
+            map.off('movestart', hideHint); // להסיר את האירוע
+        };
+
+        map.on('movestart', hideHint); // מסתיר את הרמז ברגע שהמשתמש מתחיל להזיז את המפה
+        setTimeout(hideHint, 5000); // אם לא הוזזה המפה ב-5 שניות, מסתיר את הרמז
+    }
 <style>
 body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidden; }
 #map { position:absolute; top:0; bottom:0; width:100%; }
@@ -296,6 +328,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
