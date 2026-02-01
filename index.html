@@ -2,12 +2,28 @@
 <html lang="he">
 <head>
 <meta charset="utf-8" />
-<title>מפת גינות ושאלון איכויות</title>
+<title>מפת גינות ובתי קפה – שאלון איכויות</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
 body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidden; }
 #map { position:absolute; top:0; bottom:0; width:100%; }
+.popup-container { position: fixed; top:50%; left:50%; transform: translate(-50%, -50%) scale(0.8); background: #fff; padding:16px 20px; border-radius:16px; width:90%; max-width:360px; z-index:9999; text-align:right; color:#000; box-shadow:0 8px 20px rgba(0,0,0,0.4); display:none; opacity:0; transition:all 0.3s ease-in-out; }
+.popup-container.show { display:block; opacity:1; transform:translate(-50%, -50%) scale(1); }
+.popup-container h4 { margin:6px 0; font-size:1.1em; }
+.popup-container p.question { font-weight:bold; margin-bottom:8px; font-size:1em; }
+.popup-container img { width:120px; height:120px; border-radius:50%; object-fit:contain !important; background-color:#fff; border:2px solid #ddd; margin:8px auto; display:block; transform: scale(1.2); }
+.popup-container label { display:block; margin:4px 0; font-size:0.95em; }
+.popup-container textarea { width:90%; border-radius:4px; padding:4px; margin-top:4px; font-family:inherit; display:block; transform: scale(1.2); }
+.popup-container button { background-color:#388E3C; color:white; border:none; border-radius:8px; padding:8px 16px; margin:6px; cursor:pointer; font-weight:bold; transition:all 0.2s; }
+.popup-container button:hover { background-color:#2e7d32; }
+.save-msg { display:none; font-weight:bold; margin-top:8px; color:#388E3C; }
+
+#nickname-popup input { width:90%; padding:6px; border-radius:6px; margin-top:6px; font-size:1em; font-family:inherit; }
+#nickname-popup p { font-size:1em; margin-bottom:6px; }
+
+#additional-question { opacity:0; transform:translateY(10px); transition:all 0.35s ease; }
+#additional-question.show { opacity:1; transform:translateY(0); }
 
 .popup-container {
   position: fixed;
@@ -192,4 +208,5 @@ finishBtn.onclick=()=>{
 </script>
 </body>
 </html>
+
 
