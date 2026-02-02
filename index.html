@@ -8,7 +8,25 @@
 <style>
 body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidden; }
 #map { position:absolute; top:0; bottom:0; width:100%; }
-.popup-container { position: fixed; top:50%; left:50%; transform: translate(-50%, -50%) scale(0.8); background: #fff; padding:16px 20px; border-radius:16px; width:90%; max-width:360px; z-index:9999; text-align:right; color:#000; box-shadow:0 8px 20px rgba(0,0,0,0.4); display:none; opacity:0; transition:all 0.3s ease-in-out; }
+.popup-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 16px 20px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 360px;
+  z-index: 9999;
+  text-align: right;
+  color: #000;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  display: none;
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+}
+
 .popup-container.show { display:block; opacity:1; transform:translate(-50%, -50%) scale(1); }
 .popup-container h4 { margin:6px 0; font-size:1.1em; }
 .popup-container p.question { font-weight:bold; margin-bottom:8px; font-size:1em; }
@@ -113,7 +131,7 @@ const parksData = [
   {"name":"גן ליאון רקנאטי","lat":32.12273266261491,"lon":34.803450038810816},
   {"name":"גינת ברקאי","lat":32.1240135,"lon":34.8064948},
   {"name":"גינת הרוחות","lat":32.12349022117299,"lon":34.816722543405106},
-   {"name":"חוף הים טיילת","lat":32.12360,"lon":34.78343},
+  {"name":"חוף הים טיילת","lat":32.12360,"lon":34.78343},
 ].filter(p => !excluded.includes(p.name));
 
 let nickname = "";
