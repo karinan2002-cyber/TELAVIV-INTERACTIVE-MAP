@@ -65,93 +65,31 @@
 <script>
     // כל שאר הקוד שלך
 
+    const map = L.map('map');  // כאן יוצרים את האובייקט של המפה
+    map.setView([32.127, 34.798], 15);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+    // ========================
+    // רמז להזיז את המפה בנייד
+    // ========================
     const mapHint = document.getElementById("map-hint");
 
-    if(window.innerWidth < 768) { // רק לנייד
+    // להראות רק אם המסך צר (נייד)
+    if(window.innerWidth < 768) {
         mapHint.style.opacity = 1;
 
         const hideHint = () => {
             mapHint.style.opacity = 0;
-            map.off('movestart', hideHint); // להסיר את האירוע
+            map.off('movestart', hideHint); // להסיר אירוע אחרי שמסתיר
         };
 
-        map.on('movestart', hideHint); // מסתיר את הרמז ברגע שהמשתמש מתחיל להזיז את המפה
-        setTimeout(hideHint, 5000); // אם לא הוזזה המפה ב-5 שניות, מסתיר את הרמז
+        // ברגע שהמשתמש מתחיל להזיז את המפה – ההודעה נעלמת
+        map.on('movestart', hideHint);
+
+        // אם המשתמש לא הזיז את המפה תוך 5 שניות – ההודעה נעלמת
+        setTimeout(hideHint, 5000);
     }
-<style>
-body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidden; }
-#map { position:absolute; top:0; bottom:0; width:100%; }
-.popup-container { position: fixed; top:50%; left:50%; transform: translate(-50%, -50%) scale(0.8); background: #fff; padding:16px 20px; border-radius:16px; width:90%; max-width:360px; z-index:9999; text-align:right; color:#000; box-shadow:0 8px 20px rgba(0,0,0,0.4); display:none; opacity:0; transition:all 0.3s ease-in-out; }
-.popup-container.show { display:block; opacity:1; transform:translate(-50%, -50%) scale(1); }
-.popup-container h4 { margin:6px 0; font-size:1.1em; }
-.popup-container p.question { font-weight:bold; margin-bottom:8px; font-size:1em; }
-.popup-container img { width:120px; height:120px; border-radius:50%; object-fit:contain !important; background-color:#fff; border:2px solid #ddd; margin:8px auto; display:block; transform: scale(1.2); }
-.popup-container label { display:block; margin:4px 0; font-size:0.95em; }
-.popup-container textarea { width:90%; border-radius:4px; padding:4px; margin-top:4px; font-family:inherit; display:block; transform: scale(1.2); }
-.popup-container button { background-color:#388E3C; color:white; border:none; border-radius:8px; padding:8px 16px; margin:6px; cursor:pointer; font-weight:bold; transition:all 0.2s; }
-.popup-container button:hover { background-color:#2e7d32; }
-.save-msg { display:none; font-weight:bold; margin-top:8px; color:#388E3C; }
-
-#nickname-popup input { width:90%; padding:6px; border-radius:6px; margin-top:6px; font-size:1em; font-family:inherit; }
-#nickname-popup p { font-size:1em; margin-bottom:6px; }
-
-#additional-question { opacity:0; transform:translateY(10px); transition:all 0.35s ease; }
-#additional-question.show { opacity:1; transform:translateY(0); }
-
-.marker-thumb { width:52px; height:52px; border-radius:50%; border:2px solid white; overflow:hidden; box-shadow:0 0 4px rgba(0,0,0,0.4); background-color:#4CAF50; position:relative; }
-.marker-thumb img { width:100%; height:100%; object-fit:cover !important; }
-
-.confirm-icon { position:absolute; top:40%; left:50%; transform:translate(-50%, -50%) scale(0.8); background-color:#00C853; color:white; font-weight:bold; border-radius:50%; width:72px; height:72px; text-align:center; line-height:72px; font-size:48px; opacity:0; transition:all 0.4s ease; pointer-events:none; z-index:1000; }
-.confirm-icon.show { opacity:1; transform:translate(-50%, -50%) scale(1.2); }
-
-#main-question { position:fixed; top:10px; left:50%; transform:translateX(-50%); background:#fff; padding:12px 16px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3); max-width:360px; z-index:9999; text-align:center; font-size:0.95em; color:#000; transition:all 0.3s ease; }
-#main-question.hide { opacity:1; transform:translate(-50%, 0); pointer-events:auto; }
-
-#finish-btn { position:fixed; bottom:10px; left:10px; background:#ccc; color:white; border:none; border-radius:8px; padding:10px 20px; cursor:not-allowed; font-weight:bold; z-index:9999; transition:all 0.3s ease; }
-#finish-btn.ready { background:#388E3C; cursor:pointer; }
-</style>
-</head>
-<body>
-
-<div id="map"></div>
-
-<div id="main-question">
-  <strong>אילו איכויות יש למרחבים הציבוריים הירוקים בסביבת המגורים שלכם?</strong><br>
-  אנא לחצו על תמונה וענו על השאלה.
-</div>
-
-<div id="nickname-popup" class="popup-container">
-  <p>😊 אנא הכניסו כינוי אישי (לזכר/נקבה):</p>
-  <input type="text" id="nickname-input" placeholder="למשל: פילפילון">
-  <button id="nickname-submit">שלח</button>
-</div>
-
-<div id="popup" class="popup-container">
-  <p class="question">אילו איכויות יש למרחב?</p>
-  <h4 id="popup-title"></h4>
-  <img id="popup-img" src="">
-  <div id="checkboxes"></div>
-  <div id="additional-question">
-    <p><strong>האם יש למקום איכויות נוספות?</strong></p>
-    <button id="yes-btn">כן</button>
-    <button id="no-btn">לא</button>
-  </div>
-  <div id="save-msg" class="save-msg">✔ נשמר!</div>
-</div>
-
-<div id="check-icon" class="confirm-icon">✔</div>
-<button id="finish-btn">סיום שאלון</button>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZ5X0oUh1nU8cM60lUFkHeaRAheh2ddAM8yt0J_YmCwANVptpKuohuBwFiX6VKNec/exec"; // כאן להכניס את URL של ה-Apps Script שלך
-
-const map = L.map('map');  // כאן יוצרים את האובייקט של המפה
-map.setView([32.127, 34.798], 15);
-
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
 const qualities = [
   "נוף יפה","מרחב טבע","הרגשה של יער","חופש ומרחב","פארק אטרקטיבי",
@@ -328,6 +266,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
