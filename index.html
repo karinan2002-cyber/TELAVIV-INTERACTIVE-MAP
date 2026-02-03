@@ -250,20 +250,29 @@ function createIcon(name, active=false){
     "גינת הרוחות"
   ];
 
-  const sizeClass = largeImages.includes(name) ? "large" : "";
+  const isLarge = largeImages.includes(name);
+  const size = isLarge ? 68 : 52;
 
   return L.divIcon({
     className: "",
+    iconSize: [size, size],          // 🔴 זה הקריטי
+    iconAnchor: [size/2, size/2],    // 🔴 מרכז העיגול לנקודה
     html: `
-      <div class="marker-thumb ${sizeClass}"
+      <div class="marker-thumb"
            style="
+             width:${size}px;
+             height:${size}px;
              border-color:${borderColor};
              background-color:${background};
              background-image:url('images/${name}.jpg');
+             background-size:contain;
+             background-position:center;
+             background-repeat:no-repeat;
            ">
       </div>`
   });
 }
+
 
 let selectedParks = 0;
 const mainQuestion = document.getElementById("main-question");
@@ -347,6 +356,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
