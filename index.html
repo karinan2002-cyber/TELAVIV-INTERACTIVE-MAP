@@ -104,6 +104,9 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZ5X0oUh1nU8cM60lUF
 
 const map = L.map("map").setView([32.125, 34.802], 16);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+map.on('load', function() {
+    console.log('המפה נטענה בהצלחה');
+});
 
 const qualities = [
   "נוף יפה","מרחב טבע","הרגשה של יער","חופש ומרחב","פארק אטרקטיבי",
@@ -295,6 +298,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
