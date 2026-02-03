@@ -231,44 +231,43 @@ let selectedParks = 0;
 const mainQuestion = document.getElementById("main-question");
 const finishBtn = document.getElementById("finish-btn");
 
-parksData.forEach(p=>{
-  p.hasSelection=false;
-const marker = L.marker([p.lat, p.lon], {
-  icon: createIcon(p.name, false)
-}).addTo(map);
+parksData.forEach(p => {
+  p.hasSelection = false;
+  const marker = L.marker([p.lat, p.lon], {
+    icon: createIcon(p.name, false)
+  }).addTo(map);
+
+  // הוספת תמונה רק כאשר הסמן נוסף למפה
   marker.on('add', () => {
-  marker.getElement().style.backgroundImage =
-    `url('images/${p.name}.jpg')`;
-})
+    const el = marker.getElement();
+    if (el) el.style.backgroundImage = `url('images/${p.name}.jpg')`;  // מוודא שהתמונה תוצג לאחר שהסמן נוסף למפה
+  });
 
-marker.getElement().style.backgroundImage = `url('images/${p.name}.jpg')`;
+  marker.on("click", () => {
+    const popup = document.getElementById("popup");
+    const title = document.getElementById("popup-title");
+    const img = document.getElementById("popup-img");
+    const checkboxesDiv = document.getElementById("checkboxes");
+    const additionalQ = document.getElementById("additional-question");
+    const yesBtn = document.getElementById("yes-btn");
+    const noBtn = document.getElementById("no-btn");
+    const saveMsg = document.getElementById("save-msg");
+    const checkIcon = document.getElementById("check-icon");
 
+    title.textContent = p.name;
+    img.src = `images/${p.name}.jpg`;
 
-  marker.on("click",()=>{
-    const popup=document.getElementById("popup");
-    const title=document.getElementById("popup-title");
-    const img=document.getElementById("popup-img");
-    const checkboxesDiv=document.getElementById("checkboxes");
-    const additionalQ=document.getElementById("additional-question");
-    const yesBtn=document.getElementById("yes-btn");
-    const noBtn=document.getElementById("no-btn");
-    const saveMsg=document.getElementById("save-msg");
-    const checkIcon=document.getElementById("check-icon");
-
-    title.textContent=p.name;
-    img.src=`images/${p.name}.jpg`;
-
-    checkboxesDiv.innerHTML="";
+    checkboxesDiv.innerHTML = "";
     additionalQ.classList.remove("show");
-    saveMsg.style.display="none";
+    saveMsg.style.display = "none";
 
-    qualities.forEach(q=>{
-      if(q.includes("איכות אחרת")){
-        checkboxesDiv.innerHTML+=
+    qualities.forEach(q => {
+      if (q.includes("איכות אחרת")) {
+        checkboxesDiv.innerHTML +=
           `<label><input type="checkbox" value="${q}" class="chk"> ${q}</label>
            <textarea class="other-text" placeholder="כתבו כאן..." rows="2"></textarea>`;
       } else {
-        checkboxesDiv.innerHTML+=
+        checkboxesDiv.innerHTML +=
           `<label><input type="checkbox" value="${q}" class="chk"> ${q}</label>`;
       }
     });
@@ -279,45 +278,45 @@ marker.getElement().style.backgroundImage = `url('images/${p.name}.jpg')`;
     const otherField = checkboxesDiv.querySelector(".other-text");
     let typingTimer;
 
-    checkboxes.forEach(chk=>{
-      chk.onchange=()=>{
-        const anyChecked=[...checkboxes].some(c=>c.checked);
-        if(!p.hasSelection && anyChecked) selectedParks++;
-        p.hasSelection=anyChecked;
+    checkboxes.forEach(chk => {
+      chk.onchange = () => {
+        const anyChecked = [...checkboxes].some(c => c.checked);
+        if (!p.hasSelection && anyChecked) selectedParks++;
+        p.hasSelection = anyChecked;
 
         marker.setIcon(createIcon(p.name, anyChecked));
         sendDataToSheet(p.name, chk.value, chk.checked);
 
-        if(anyChecked){
+        if (anyChecked) {
           checkIcon.classList.add("show");
-          setTimeout(()=>{ checkIcon.classList.remove("show"); additionalQ.classList.add("show"); },800);
+          setTimeout(() => { checkIcon.classList.remove("show"); additionalQ.classList.add("show"); }, 800);
         }
 
-        if(selectedParks>=5) finishBtn.classList.add("ready");
+        if (selectedParks >= 5) finishBtn.classList.add("ready");
       };
     });
 
-    if(otherField){
-      otherField.addEventListener("input", ()=>{
+    if (otherField) {
+      otherField.addEventListener("input", () => {
         clearTimeout(typingTimer);
-        typingTimer = setTimeout(()=>{ sendDataToSheet(p.name,"איכות אחרת (טקסט חופשי)",otherField.value); },1200);
+        typingTimer = setTimeout(() => { sendDataToSheet(p.name, "איכות אחרת (טקסט חופשי)", otherField.value); }, 1200);
       });
     }
 
-    yesBtn.onclick=()=>additionalQ.classList.remove("show");
-    noBtn.onclick=()=>{
+    yesBtn.onclick = () => additionalQ.classList.remove("show");
+    noBtn.onclick = () => {
       additionalQ.classList.remove("show");
-      saveMsg.style.display="block";
-      setTimeout(()=>popup.classList.remove("show"),1500);
+      saveMsg.style.display = "block";
+      setTimeout(() => popup.classList.remove("show"), 1500);
     };
-
   });
 });
-
+ 
 finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את השאלון!"); };
 </script>
 </body>
 </html>
+
 
 
 
