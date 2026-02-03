@@ -56,6 +56,19 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
   background-repeat: no-repeat;
   background-size: contain;
 }
+
+.leaflet-marker-icon.marker-icon {
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 4px rgba(0,0,0,0.4);
+  background-color: #4CAF50;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  padding: 6px;          /* ⭐ זה הסוד */
+  box-sizing: border-box;
+}
+
   
 .confirm-icon { position:absolute; top:40%; left:50%; transform:translate(-50%, -50%) scale(0.8); background-color:#00C853; color:white; font-weight:bold; border-radius:50%; width:72px; height:72px; text-align:center; line-height:72px; font-size:48px; opacity:0; transition:all 0.4s ease; pointer-events:none; z-index:1000; }
 .confirm-icon.show { opacity:1; transform:translate(-50%, -50%) scale(1.2); }
@@ -220,10 +233,13 @@ const finishBtn = document.getElementById("finish-btn");
 
 parksData.forEach(p=>{
   p.hasSelection=false;
-  const marker = L.marker([p.lat,p.lon], {icon:createIcon(p.name,false)}).addTo(map);
-  const marker = L.marker([p.lat, p.lon], {
+const marker = L.marker([p.lat, p.lon], {
   icon: createIcon(p.name, false)
 }).addTo(map);
+  marker.on('add', () => {
+  marker.getElement().style.backgroundImage =
+    `url('images/${p.name}.jpg')`;
+})
 
 marker.getElement().style.backgroundImage = `url('images/${p.name}.jpg')`;
 
@@ -302,6 +318,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
