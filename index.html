@@ -205,7 +205,7 @@ function sendDataToSheet(parkName, quality, value){
 fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", body:formData });
 }
 
-function createIcon(name, active=false){
+function createIcon(name, active=false) {
   const largeImages = [
     "חוף הים טיילת",
     "גן בית צורי",
@@ -213,19 +213,15 @@ function createIcon(name, active=false){
     "קאנטרי ברזני",
     "גינת הרוחות"
   ];
+  const size = largeImages.includes(name) ? [68, 68] : [52, 52];
 
-  const isLarge = largeImages.includes(name);
-  const size = isLarge ? 68 : 52;
-
-  return L.divIcon({
-    className: "marker-icon",
-    iconSize: [size, size],
-    iconAnchor: [size/2, size/2],
-    html: "",   // ❗ אין HTML פנימי
-    style: "",
+  return L.icon({
+    iconUrl: `images/${name}.jpg`, // כאן מחברים את התמונה ישירות
+    iconSize: size,
+    iconAnchor: [size[0]/2, size[1]/2],
+    popupAnchor: [0, -size[1]/2]
   });
 }
-
 
 let selectedParks = 0;
 const mainQuestion = document.getElementById("main-question");
@@ -316,6 +312,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
