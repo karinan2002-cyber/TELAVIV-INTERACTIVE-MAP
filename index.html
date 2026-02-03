@@ -57,6 +57,34 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
   background:#fff;
 }
 
+/* סמן רגיל – כמו עכשיו */
+.marker-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid white;
+  overflow: hidden;
+  box-shadow: 0 0 4px rgba(0,0,0,0.4);
+  background-color:#4CAF50;
+  position:relative;
+}
+
+/* סמן גדול לתמונות רחבות */
+.marker-thumb.large {
+  width: 68px;
+  height: 68px;
+}
+
+/* התמונה עצמה */
+.marker-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
+  box-sizing: border-box;
+  background: #fff;
+}
+
 .confirm-icon { position:absolute; top:40%; left:50%; transform:translate(-50%, -50%) scale(0.8); background-color:#00C853; color:white; font-weight:bold; border-radius:50%; width:72px; height:72px; text-align:center; line-height:72px; font-size:48px; opacity:0; transition:all 0.4s ease; pointer-events:none; z-index:1000; }
 .confirm-icon.show { opacity:1; transform:translate(-50%, -50%) scale(1.2); }
 
@@ -196,7 +224,7 @@ function createIcon(name, active=false){
   const borderColor = active ? "#00C853" : "white";
   const background = active ? "#C8E6C9" : "#4CAF50";
 
-  const fillImages = [
+  const largeImages = [
     "חוף הים טיילת",
     "גן בית צורי",
     "גן אלפרד ביר",
@@ -204,14 +232,16 @@ function createIcon(name, active=false){
     "גינת הרוחות"
   ];
 
-  const fillClass = fillImages.includes(name) ? "fill-circle" : "";
+  const sizeClass = largeImages.includes(name) ? "large" : "";
 
   return L.divIcon({
     className: "",
     html: `
-      <div class="marker-thumb" style="border-color:${borderColor};background:${background};">
-        <img class="${fillClass}" src="images/${name}.jpg"
-             onerror="this.style.display='none';this.parentElement.style.backgroundColor='#228B22';">
+      <div class="marker-thumb ${sizeClass}"
+           style="border-color:${borderColor};background:${background};">
+        <img src="images/${name}.jpg"
+             onerror="this.style.display='none';
+                      this.parentElement.style.backgroundColor='#228B22';">
       </div>`
   });
 }
@@ -298,6 +328,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
