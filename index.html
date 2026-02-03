@@ -47,47 +47,7 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
 #additional-question { opacity:0; transform:translateY(10px); transition:all 0.35s ease; }
 #additional-question.show { opacity:1; transform:translateY(0); }
 
-.marker-thumb { width:52px; height:52px; border-radius:50%; border:2px solid white; overflow:hidden; box-shadow:0 0 4px rgba(0,0,0,0.4); background-color:#4CAF50; position:relative; }
-.marker-thumb img {
-  width:100%;
-  height:100%;
-  object-fit:contain !important;
-  padding:4px;
-  box-sizing:border-box;
-  background:#fff;
-}
-
-/* סמן רגיל – כמו עכשיו */
-.marker-thumb {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: 2px solid white;
-  overflow: hidden;
-  box-shadow: 0 0 4px rgba(0,0,0,0.4);
-  background-color:#4CAF50;
-  position:relative;
-}
-
-/* סמן גדול לתמונות רחבות */
-.marker-thumb.large {
-  width: 68px;
-  height: 68px;
-}
-
-/* התמונה עצמה */
-.marker-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 4px;
-  box-sizing: border-box;
-  background: #fff;
-}
-
-.marker-thumb {
-  width: 52px;
-  height: 52px;
+.marker-icon {
   border-radius: 50%;
   border: 2px solid white;
   box-shadow: 0 0 4px rgba(0,0,0,0.4);
@@ -95,12 +55,6 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
-}
-
-/* רק לתמונות הבעייתיות */
-.marker-thumb.large {
-  width: 68px;
-  height: 68px;
 }
   
 .confirm-icon { position:absolute; top:40%; left:50%; transform:translate(-50%, -50%) scale(0.8); background-color:#00C853; color:white; font-weight:bold; border-radius:50%; width:72px; height:72px; text-align:center; line-height:72px; font-size:48px; opacity:0; transition:all 0.4s ease; pointer-events:none; z-index:1000; }
@@ -239,9 +193,6 @@ fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", body:formData });
 }
 
 function createIcon(name, active=false){
-  const borderColor = active ? "#00C853" : "white";
-  const background = active ? "#C8E6C9" : "#4CAF50";
-
   const largeImages = [
     "חוף הים טיילת",
     "גן בית צורי",
@@ -254,22 +205,11 @@ function createIcon(name, active=false){
   const size = isLarge ? 68 : 52;
 
   return L.divIcon({
-    className: "",
-    iconSize: [size, size],          // 🔴 זה הקריטי
-    iconAnchor: [size/2, size/2],    // 🔴 מרכז העיגול לנקודה
-    html: `
-      <div class="marker-thumb"
-           style="
-             width:${size}px;
-             height:${size}px;
-             border-color:${borderColor};
-             background-color:${background};
-             background-image:url('images/${name}.jpg');
-             background-size:contain;
-             background-position:center;
-             background-repeat:no-repeat;
-           ">
-      </div>`
+    className: "marker-icon",
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+    html: "",   // ❗ אין HTML פנימי
+    style: "",
   });
 }
 
@@ -281,6 +221,12 @@ const finishBtn = document.getElementById("finish-btn");
 parksData.forEach(p=>{
   p.hasSelection=false;
   const marker = L.marker([p.lat,p.lon], {icon:createIcon(p.name,false)}).addTo(map);
+  const marker = L.marker([p.lat, p.lon], {
+  icon: createIcon(p.name, false)
+}).addTo(map);
+
+marker.getElement().style.backgroundImage = `url('images/${p.name}.jpg')`;
+
 
   marker.on("click",()=>{
     const popup=document.getElementById("popup");
@@ -356,6 +302,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
