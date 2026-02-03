@@ -85,6 +85,24 @@ body { margin:0; padding:0; direction:rtl; font-family:sans-serif; overflow:hidd
   background: #fff;
 }
 
+.marker-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 4px rgba(0,0,0,0.4);
+  background-color: #4CAF50;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+/* רק לתמונות הבעייתיות */
+.marker-thumb.large {
+  width: 68px;
+  height: 68px;
+}
+  
 .confirm-icon { position:absolute; top:40%; left:50%; transform:translate(-50%, -50%) scale(0.8); background-color:#00C853; color:white; font-weight:bold; border-radius:50%; width:72px; height:72px; text-align:center; line-height:72px; font-size:48px; opacity:0; transition:all 0.4s ease; pointer-events:none; z-index:1000; }
 .confirm-icon.show { opacity:1; transform:translate(-50%, -50%) scale(1.2); }
 
@@ -238,10 +256,11 @@ function createIcon(name, active=false){
     className: "",
     html: `
       <div class="marker-thumb ${sizeClass}"
-           style="border-color:${borderColor};background:${background};">
-        <img src="images/${name}.jpg"
-             onerror="this.style.display='none';
-                      this.parentElement.style.backgroundColor='#228B22';">
+           style="
+             border-color:${borderColor};
+             background-color:${background};
+             background-image:url('images/${name}.jpg');
+           ">
       </div>`
   });
 }
@@ -328,6 +347,7 @@ finishBtn.onclick=()=>{ if(selectedParks>=5) alert("תודה שסיימתם את
 </script>
 </body>
 </html>
+
 
 
 
